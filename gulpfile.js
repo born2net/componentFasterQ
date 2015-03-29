@@ -19,7 +19,6 @@ var studioDir = 'SignageStudio.86EE3EEE54D7DB049D16E358CDC443F088917621.1';
 var studioDirCyg = '/cygdrive/c/Users/Sean/AppData/Roaming/' + studioDir;
 var studioDirWin = 'C:/Users/Sean/AppData/Roaming/' + studioDir;
 
-
 gulp.task('release', function (done) {
     runSequence('debugOff', 'changeVersion', 'zip', 'rsync', 'debugOn', done);
 });
