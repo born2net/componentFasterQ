@@ -1,7 +1,7 @@
 {
-  "name": "sample",
+  "name": "fasterq",
   "version": "1.0.459",
-  "url": "http://signage.me/components/sample/sample.zip",
+  "url": "http://signage.me/components/fasterq/fasterq.zip",
   "property": "page.html",
   "desktopUseNode": false,
   "debug": false
