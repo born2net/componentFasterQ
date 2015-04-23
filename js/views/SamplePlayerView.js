@@ -4,7 +4,7 @@
  @constructor
  @return {object} instantiated SamplePlayerView
  **/
-define(['jquery', 'backbone', 'text!templates/DiggArticle.html', 'TweenLite', 'ScrollToPlugin'], function ($, Backbone, DiggArticle, TweenLite, ScrollToPlugin) {
+define(['jquery', 'backbone', 'text!templates/Line.html', 'TweenLite', 'ScrollToPlugin'], function ($, Backbone, LineTemplate, TweenLite, ScrollToPlugin) {
 
 
     var SamplePlayerView = Backbone.View.extend({
@@ -16,50 +16,19 @@ define(['jquery', 'backbone', 'text!templates/DiggArticle.html', 'TweenLite', 'S
         initialize: function () {
             var self = this;
             BB.comBroker.setService(BB.SERVICES.SAMPLE_VIEW, self);
+            BB.CONSTS.BUSINESS_ID = -1;
             self.m_jData = undefined;
             self.m_cacheExpirationSec = 1;
             self.m_purgedIfNotUsedSec = 1000000;
             self.m_scrollPosition = 0;
+            _.templateSettings = {interpolate: /\{\{(.+?)\}\}/g};
+            self.m_lineTemplate = _.template(LineTemplate);
             self._listenDispose();
             self._listenPlayerEvents();
             self._listenSendEvents();
 
             self._log('mode: ' + window.mode);
             self._log('WebKit inside SignagePlayer: ' + BB.SIGNAGEPLAYER_MODE);
-        },
-
-        /**
-         Load two images, one from resources and one from a remote http url.
-         keep in mind that if the resources (images / videos / swf etc...) were already loaded once
-         and remain within the cache expiration params, they will load from local cache.
-         This allows you to develop an HTML5 SignagePlayer component that can operate without a persistent
-         internet connection while ensuring no interruption in playback for your audience.
-
-         Also, for performance consideration, when loading multiple resources, you should sequence the load of every resource
-         when the previous has completed (i.e.: serial loading). We achieve serial loading here by nesting
-         call 2 of  getObjectValue within call 1 of getObjectValue the previous.
-         Of course you can achieve better serial loading with libraries such as async (https://github.com/caolan/async).
-         @method _loadImages
-         **/
-        _loadImages: function () {
-            try {
-                var self = this;
-                if (_.isUndefined(self.m_jData.Resource) || _.isUndefined(self.m_jData.Resource._hResource1))
-                    return;
-                var hResource = parseInt(self.m_jData.Resource._hResource1);
-                getObjectValue(0, 'getResourcePath("' + hResource + '")', function (itemSrc) {
-                    self._log('image path: ' + itemSrc);
-                    // itemSrc = itemSrc.replace(/"/,'');
-                    //var a = JSON.parse(itemSrc);
-                    $(Elements.IMAGE_FROM_RESOURCE).attr('src', itemSrc);
-
-                    getObjectValue(0, 'getCachingPath("' + self.m_jData._url + '",' + self.m_cacheExpirationSec + ',' + self.m_purgedIfNotUsedSec + ')', function (itemSrc) {
-                        $(Elements.IMAGE_FROM_URL).attr('src', itemSrc);
-                    });
-                });
-            } catch (e) {
-                log('problem loading images ' + e);
-            }
         },
 
         _log: function (i_data) {
@@ -73,9 +42,9 @@ define(['jquery', 'backbone', 'text!templates/DiggArticle.html', 'TweenLite', 'S
          **/
         _listenSendEvents: function () {
             var self = this;
-            $(Elements.FIRE_NEXT_EVENT).on('click',function(){
+            $(Elements.FIRE_NEXT_EVENT).on('click', function () {
                 self._log('sending next event');
-                self._sendEvent('next', _.random(1,100));
+                self._sendEvent('next', _.random(1, 100));
             });
         },
 
@@ -117,6 +86,37 @@ define(['jquery', 'backbone', 'text!templates/DiggArticle.html', 'TweenLite', 'S
         },
 
         /**
+         Get the last called service_id for line
+         @method _pollNowServicing server:LastCalledQueue
+         **/
+        _pollNowServicing: function (i_businessID, i_lineID) {
+            var self = this;
+            var lastCalledQueue = function () {
+                $.ajax({
+                    url: BB.CONSTS.ROOT_URL + '/LastCalledQueue',
+                    data: {
+                        business_id: i_businessID,
+                        line_id: i_lineID
+                    },
+                    success: function (i_model) {
+                        var $divLineID = $('#divLineID' + i_model['line_id']);
+                        $divLineID.find('.lineName').text(i_model.name);
+                        $divLineID.find('.serviceID').text(i_model.service_id);
+
+                    },
+                    error: function (e) {
+                        log('error ajax ' + e);
+                    },
+                    dataType: 'json'
+                });
+            };
+            self.m_statusHandler = setInterval(function () {
+                lastCalledQueue();
+            }, 5000);
+            lastCalledQueue();
+        },
+
+        /**
          Example of storing values locally for later retrieval (works only in Node-Web-Kit)
          @method _exampleSimpleStorage
          **/
@@ -124,21 +124,34 @@ define(['jquery', 'backbone', 'text!templates/DiggArticle.html', 'TweenLite', 'S
             var self = this;
             simplestorage.set('test', 123);
             if (simplestorage.get('test')) {
-                console.log('storage supported');
             } else {
-                console.log('storage not supported');
             }
         },
 
         /**
          Kick off this component when xml_data is available from AS3 SignagePlayer bridge
+         and grab the business id through reflection
          @method _dataLoaded
          @param {XML} i_xmlData
          **/
         dataLoaded: function (i_jData) {
             var self = this;
             self.m_jData = i_jData;
-            self._loadImages();
+            getObjectValue(0, 'framework.StateBroker.GetState("businessId")', function (i_business_id) {
+                BB.CONSTS.BUSINESS_ID = i_business_id
+
+                // todo: debug override business id
+                BB.CONSTS.BUSINESS_ID = 372844;
+                _.forEach(self.m_jData, function (lineID, lineKey) {
+                    if (lineKey.indexOf('lineID') > -1 && lineID != "") {
+                        var m = {
+                            divLineID: 'divLineID' + lineID
+                        };
+                        $(Elements.LINES_CONTAINER).append($(self.m_lineTemplate(m)).hide().fadeIn());
+                        self._pollNowServicing(BB.CONSTS.BUSINESS_ID, lineID);
+                    }
+                });
+            });
         }
     });
 

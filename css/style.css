@@ -182,6 +182,17 @@ p {
     padding-top: 200px;
 }
 
+.serviceID {
+    font-size: 3em;
+    color: gray;
+}
+
+.lineName {
+    font-size: 0.7em;
+    color: #2D2D2D;
+}
+
+
 .btn {
     background: #3498db;
     background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
@@ -208,4 +219,21 @@ p {
     background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
     background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
     text-decoration: none;
+}
+
+@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,900|Oswald);
+body{
+    padding: 50px 0;
+}
+.status {
+    font-family: 'Source Sans Pro', sans-serif;
+}
+.status .panel-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 72px;
+    font-weight: bold;
+    color: gray;
+    line-height: 45px;
+    padding-top: 20px;
+    letter-spacing: -0.8px;
 }

@@ -24,7 +24,6 @@ define(['jquery', 'backbone'], function ($, Backbone) {
          @param {String} msg
          **/
         log: function (msg) {
-            alert('aaa ' + window.debug);
             if (window.debug)
                 alert(new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1") + ': ' + msg);
         },

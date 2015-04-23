@@ -50,23 +50,11 @@ function getData() {
 
     // get background color
     m_data.Data._bgColor = document.getElementById('bgColor').value;
-
-    try {
-        m_data.Data._url = $('#remoteUrl').val();
-
-        // saved dragged images
-        if (_.size(m_hRsources) != 0) {
-            var n = 0;
-            m_data.Data.Resource = {};
-            for (var i in m_hRsources) {
-                n++;
-                var name = buildResourceName(n);
-                m_data.Data.Resource[name] = m_hRsources[i];
-            }
-        }
-    } catch (e) {
-        log('err 2 ' + e);
-    }
+    m_data.Data._lineID1 = document.getElementById('lineID1').value;
+    m_data.Data._lineID2 = document.getElementById('lineID2').value;
+    m_data.Data._lineID3 = document.getElementById('lineID3').value;
+    m_data.Data._lineID4 = document.getElementById('lineID4').value;
+    m_data.Data._lineID5 = document.getElementById('lineID5').value;
 
     // alert(JSON.stringify(m_data));
     // return data as xml
@@ -94,28 +82,19 @@ function setData(i_xmlData) {
         return;
 
     try {
-
         m_data = x2js.xml_str2json(i_xmlData);
 
-        if (m_data.Data._url != null) {
-            $('#remoteUrl').val(m_data.Data._url)
-            $('#img4').attr('src', m_data.Data._url);
-        }
+        if (m_data.Data._lineID1 != null)
+            $('#lineID1').val(m_data.Data._lineID1)
+        if (m_data.Data._lineID2 != null)
+            $('#lineID2').val(m_data.Data._lineID2)
+        if (m_data.Data._lineID3 != null)
+            $('#lineID3').val(m_data.Data._lineID3)
+        if (m_data.Data._lineID4 != null)
+            $('#lineID4').val(m_data.Data._lineID4)
+        if (m_data.Data._lineID5 != null)
+            $('#lineID5').val(m_data.Data._lineID5)
 
-        if (m_data.Data.Resource != null) {
-            var res = m_data.Data.Resource;
-            var n = 0;
-            for (var i in res) {
-                var m_hRsource = res[i];
-                getObjectValue(0, 'getResourcePath(' + m_hRsource + ')', function (b) {
-                    var el = $('#draggedImages').children().get(n);
-                    $(el).attr('src', JSON.parse(b));
-                    m_hRsources[i] = m_hRsource;
-
-                });
-                n++;
-            }
-        }
         // set background color
         if (m_data.Data._bgColor != null) {
             $('#bgColor').val(m_data.Data._bgColor);
@@ -131,37 +110,6 @@ function setData(i_xmlData) {
  **/
 function showSavedData() {
     alert(JSON.stringify(m_data) + ' ' + window.log);
-}
-
-/**
- Pick a random image from the resources (we get back all videos, images, swf, svg)
- but we selected to just accept png or jpg for this example. Of course you can
- choose videos or any other resource you like.
- Note that we load all resources since we pass a regexp of (".*")
- We could for example filter just resources starting with letter 'x'
- executing a regexp of 'getResources("^x")'
- @method showSavedData
- **/
-function pickRandom() {
-    try {
-
-        getObjectValue(0, 'getResources(".*")', function (resources) {
-            var oResources = JSON.parse(resources);
-            var images = [];
-            for (var i in oResources) {
-                if (oResources[i].type == 'png' || oResources[i].type == 'jpg')
-                    images.push(oResources[i]);
-            }
-            var random = _.random(0, images.length - 1);
-            var selected = images[random];
-            getObjectValue(0, 'getResourcePath(' + selected.handle + ')', function (e) {
-                $('#img3').attr('src', JSON.parse(e));
-            });
-        });
-
-    } catch (e) {
-        log('err 3 ' + e);
-    }
 }
 
 /**
@@ -191,10 +139,6 @@ $(document).ready(function () {
     var self = this;
 
     $('#tab-container').easytabs();
-
-    $('#pickRandom').on('click', function (e) {
-        pickRandom();
-    });
 
     $('#showSavedData').on('click', function (e) {
         showSavedData();

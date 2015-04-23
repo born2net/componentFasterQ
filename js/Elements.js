@@ -5,6 +5,7 @@ Elements.IMAGE_FROM_RESOURCE = '#imageFromResource';
 Elements.IMAGE_FROM_URL = '#imageFromURL';
 Elements.FIRE_NEXT_EVENT = '#fireNextEvent';
 Elements.CONSOLE_LOG = '#consoleLog';
+Elements.LINES_CONTAINER = '#linesContainer';
 
 // templates
 Elements.LANGUAGE_SELECTOR_TEMPLATE = '#languageSelector';

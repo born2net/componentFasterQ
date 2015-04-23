@@ -27,6 +27,8 @@ define(['Consts', 'bootstrap', 'backbone.controller', 'ComBroker', 'Lib', 'Eleme
             BB.comBroker = new ComBroker();
             BB.comBroker.name = 'AppBroker';
             window.log = BB.lib.log;
+            BB.CONSTS.ROOT_URL = 'https://secure.digitalsignage.com' + (window.debug ? ':442' : '');
+
 
             $.ajaxSetup({cache: false});
             $.ajaxSetup({headers: {'Authorization': ''}});
@@ -55,12 +57,17 @@ define(['Consts', 'bootstrap', 'backbone.controller', 'ComBroker', 'Lib', 'Eleme
             var self = this;
             var fd = setInterval(function () {
                 if (window.xmlData) {
-                    var x2js = new X2JS();
-                    var jData = x2js.xml_str2json(window.xmlData);
-                    self._setStyle(jData.Data);
-                    window.clearInterval(fd);
-                    self.m_SamplePlayerView.dataLoaded(jData.Data);
-                    self.m_stackView.selectView(self.m_SamplePlayerView);
+                    try {
+                        var x2js = new X2JS();
+                        var jData = x2js.xml_str2json(window.xmlData);
+                        self._setStyle(jData.Data);
+                        window.clearInterval(fd);
+                        self.m_SamplePlayerView.dataLoaded(jData.Data);
+                        self.m_stackView.selectView(self.m_SamplePlayerView);
+                    } catch(e){
+                        log('err 66' + e);
+                    }
+
                 }
             }, 1000);
         },
