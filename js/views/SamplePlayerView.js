@@ -139,9 +139,7 @@ define(['jquery', 'backbone', 'text!templates/Line.html', 'TweenLite', 'ScrollTo
             self.m_jData = i_jData;
             getObjectValue(0, 'framework.StateBroker.GetState("businessId")', function (i_business_id) {
                 BB.CONSTS.BUSINESS_ID = i_business_id
-
-                // todo: debug override business id
-                BB.CONSTS.BUSINESS_ID = 372844;
+                //BB.CONSTS.BUSINESS_ID = 372844;
                 _.forEach(self.m_jData, function (lineID, lineKey) {
                     if (lineKey.indexOf('lineID') > -1 && lineID != "") {
                         var m = {

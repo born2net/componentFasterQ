@@ -20,6 +20,7 @@ define(['Consts', 'bootstrap', 'backbone.controller', 'ComBroker', 'Lib', 'Eleme
 
         initialize: function () {
             var self = this;
+            // window.debug = 0;
             BB.globs['UNIQUE_COUNTER'] = 0;
             BB.Elements = Elements;
             BB.lib = new Lib();
@@ -27,8 +28,8 @@ define(['Consts', 'bootstrap', 'backbone.controller', 'ComBroker', 'Lib', 'Eleme
             BB.comBroker = new ComBroker();
             BB.comBroker.name = 'AppBroker';
             window.log = BB.lib.log;
-            BB.CONSTS.ROOT_URL = 'https://secure.digitalsignage.com' + (window.debug ? ':442' : '');
-
+            //BB.CONSTS.ROOT_URL = 'https://secure.digitalsignage.com' + (window.debug ? ':442' : '');
+            BB.CONSTS.ROOT_URL = 'https://secure.digitalsignage.com';
 
             $.ajaxSetup({cache: false});
             $.ajaxSetup({headers: {'Authorization': ''}});
@@ -64,7 +65,7 @@ define(['Consts', 'bootstrap', 'backbone.controller', 'ComBroker', 'Lib', 'Eleme
                         window.clearInterval(fd);
                         self.m_SamplePlayerView.dataLoaded(jData.Data);
                         self.m_stackView.selectView(self.m_SamplePlayerView);
-                    } catch(e){
+                    } catch (e) {
                         log('err 66' + e);
                     }
 
@@ -79,7 +80,8 @@ define(['Consts', 'bootstrap', 'backbone.controller', 'ComBroker', 'Lib', 'Eleme
          **/
         _setStyle: function (i_style) {
             var self = this;
-            $('.bgColor').css({'backgroundColor': i_style._bgColor})
+            var color = BB.lib.decimalToHex(i_style._bgColor);
+            $('.bgColor').css({'backgroundColor': '#'+color});
         },
 
         /**
